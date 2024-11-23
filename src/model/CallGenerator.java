@@ -9,7 +9,7 @@ public class CallGenerator {
 
     public CallGenerator(int id, double lambda) {
         this.id = id;
-        this.lambda = lambda; // Интенсивность заявок
+        this.lambda = lambda;
     }
 
     public Call generateCall(double currentTime) {

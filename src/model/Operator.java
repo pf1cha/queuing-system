@@ -12,11 +12,8 @@ public class Operator {
         this.isBusy = false;
     }
 
-    // Генерация случайного времени обслуживания в диапазоне от min до max
     public double generateServiceTime() {
-        // Минимальное время обслуживания
         double minServiceTime = 1.0;
-        // Максимальное время обслуживания
         double maxServiceTime = 5.0;
         return minServiceTime + (maxServiceTime - minServiceTime) * Math.random();
     }
@@ -35,7 +32,6 @@ public class Operator {
         this.currentCall = call;
         call.setServiceStartTime(currentTime);
         call.setOperatorId(this.id);
-        // Генерируем время обслуживания на основе равномерного распределения
         double serviceTime = generateServiceTime();
         call.setServiceTime(serviceTime);
     }

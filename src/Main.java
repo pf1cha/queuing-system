@@ -14,7 +14,7 @@ public class Main {
                 break;
             case "step":
                 Model modelS = new Model(3, 2, 0.4, 3);
-                modelS.run(10, Simulation.StepByStep);
+                modelS.runStepByStep(10);
                 break;
             case "optimal":
                 findOptimal();

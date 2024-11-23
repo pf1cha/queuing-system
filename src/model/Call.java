@@ -8,9 +8,7 @@ public class Call {
     private double departureTime;
     private boolean rejected;
     private int operatorId;
-    private int generatorId;
-    //private final double bufferTime;
-    //private final double rejectedTime;
+    private final int generatorId;
 
     public Call(int id, double arrivalTime, int generatorId) {
         this.id = id;
@@ -29,7 +27,6 @@ public class Call {
                 ", operatorId=" + operatorId + "}");
     }
 
-    // Методы для установки времени обслуживания
     public double getServiceTime() {
         return serviceTime;
     }

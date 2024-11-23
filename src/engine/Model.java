@@ -1,13 +1,6 @@
 package engine;
-
 import model.*;
-
 import java.util.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import engine.Simulation;
 
 
 public class Model {
@@ -34,15 +27,6 @@ public class Model {
         futureEventList = new FutureEventList();
         calls = new ArrayList<>();
         currentTime = 0.0;
-    }
-
-    public void run(double simulationTime, Simulation simulation) {
-        if (simulation == Simulation.Automatic) {
-            runSimulation(simulationTime);
-        }
-        else if (simulation == Simulation.StepByStep) {
-            runStepByStep(simulationTime);
-        }
     }
 
     public void runStepByStep(double simulationTime) {
@@ -187,6 +171,10 @@ public class Model {
             }
         }
 
+        return getStringDoubleMap(simulationTime);
+    }
+
+    private Map<String, Double> getStringDoubleMap(double simulationTime) {
         double refusePercent = (double) dispatcher.getRejectedCalls() / calls.size();
         double operatorsUsage = 0.0;
         for (var operator : operators) {
@@ -207,7 +195,6 @@ public class Model {
         result.put("refusePercent", refusePercent);
         result.put("operatorsUsage", operatorsUsage);
         result.put("timeInSystem", timeInSystem);
-
         return result;
     }
 
