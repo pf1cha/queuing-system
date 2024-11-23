@@ -27,11 +27,11 @@ public class Main {
     }
 
     public static void findOptimal() {
-        int minNumOperators = 2;
-        int maxNumOperators = 6;
+        int minNumOperators = 1;
+        int maxNumOperators = 5;
         int minNumGenerators = 4;
         int maxNumGenerators = 11;
-        double lambda = 0.3;
+        double lambda = 0.2;
         int minBufferCapacity = 10;
         int maxBufferCapacity = 31;
         System.out.println("Generator | Buffer | Operators | Refuse % | Operator Usage | Time in System");
@@ -41,7 +41,7 @@ public class Main {
             for (int j = minBufferCapacity; j < maxBufferCapacity; ++j) {
                 for (int k = minNumOperators; k < maxNumOperators; ++k) {
                     Model model = new Model(k, j, lambda, i);
-                    Map<String, Double> result = model.runOptimal(2500);
+                    Map<String, Double> result = model.runOptimal(4000);
                     double refuse = result.get("refusePercent") * 100;
                     double operatorUsage = result.get("operatorsUsage") * 100;
                     double timeInSystem = result.get("timeInSystem");
