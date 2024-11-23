@@ -1,14 +1,29 @@
 import engine.*;
 
 import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        findOptimal();
-//        Model model = new Model(3, 2, 0.4, 3);
-//        model.run(10, Simulation.StepByStep);
-//        Model model = new Model(8, 11, 0.2, 11);
-//        model.runSimulation(2500);
+        Scanner sc = new Scanner(System.in);
+        String word = sc.nextLine().toLowerCase();
+        switch (word) {
+            case "automatic":
+                Model model = new Model(8, 7, 0.2, 11);
+                model.runSimulation(2500);
+                break;
+            case "step":
+                Model modelS = new Model(3, 2, 0.4, 3);
+                modelS.run(10, Simulation.StepByStep);
+                break;
+            case "optimal":
+                findOptimal();
+                break;
+            default:
+                System.out.println("Invalid input. Please enter one of the following: automatic, step, or optimal.");
+        }
+
+        sc.close();
     }
 
     public static void findOptimal() {
