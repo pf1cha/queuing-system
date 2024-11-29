@@ -81,18 +81,44 @@ public class Model {
     }
 
     private void stepByStepStats() {
-        System.out.println("The buffer size is: " + buffer.size());
+        System.out.println("Buffer information:");
+        buffer.info();
+//        System.out.println("\nGenerators information");
+//        for (var generator : generators) {
+//            System.out.println("Generator " + generator.getId() +
+//                    " has generated " + generator.generatedItemsAmount + " calls");
+//        }
+//        System.out.println("\nOperators information");
+//        for (var operator : operators) {
+//            int currentCallId = operator.getCurrentCallId();
+//            System.out.println("Operator " + operator.getId() +
+//                    " Current call id: " + (currentCallId == 0 ? "None" : currentCallId) +
+//                    ", Total calls: " +  operator.getCallAmount() +
+//                    ", Total time work: " + operator.getTotalWorkTime());
+//        }
+        System.out.println("Generators information");
+        System.out.println("+----+-------------+");
+        System.out.printf("| %-2s | %-11s |\n", "ID", "Total Calls");
+        System.out.println("+----+-------------+");
         for (var generator : generators) {
-            System.out.println("Generator " + generator.getId() +
-                    " has generated " + generator.generatedItemsAmount + " calls");
+            System.out.printf("| %-2d | %-11d |\n", generator.getId(), generator.generatedItemsAmount);
         }
+        System.out.println("+----+-------------+");
+
+        System.out.println("Operators information");
+        System.out.println("+----+---------+-------------+-----------------+");
+        System.out.printf("| %-2s | %-7s | %-11s | %-15s |\n", "ID", "Call ID", "Total Calls", "Total Work Time");
+        System.out.println("+----+---------+-------------+-----------------+");
+
         for (var operator : operators) {
             int currentCallId = operator.getCurrentCallId();
-            System.out.println("Operator " + operator.getId() +
-                    " Current call id: " + (currentCallId == 0 ? "None" : currentCallId) +
-                    ", Total calls: " +  operator.getCallAmount() +
-                    ", Total time work: " + operator.getTotalWorkTime());
+            System.out.printf("| %-2d | %-7s | %-11d | %-15.2f |\n",
+                    operator.getId(),
+                    (currentCallId == 0 ? "None" : currentCallId),
+                    operator.getCallAmount(),
+                    operator.getTotalWorkTime());
         }
+        System.out.println("+----+---------+-------------+-----------------+");
     }
 
     public void runSimulation(double simulationTime) {
@@ -199,18 +225,24 @@ public class Model {
     }
 
     private void printSimulationResults() {
-        System.out.println("Simulation ended at time " + currentTime);
+        System.out.printf("Simulation ended at time %.2f \n", currentTime);
         System.out.println("Total number of generated calls: " + CallGenerator.getCallsNumber());
         System.out.println("Total number of rejected calls: " + dispatcher.getRejectedCalls());
-        System.out.println("Stats for operators:");
-        for (Operator operator : operators) {
-            System.out.println("Operator " + operator.getId() + " worked for " + operator.getTotalWorkTime() + " time units.");
-        }
-        System.out.println("Final buffer size: " + buffer.getSize() + " calls.");
         double temp = (double) dispatcher.getRejectedCalls() / calls.size() * 100;
-        System.out.println("Rejected rate is " + temp + " % percent");
-        System.out.println("Stats for each generator: \n\n");
+        System.out.printf("Rejected rate is %.2f %% percent\n", temp);
+        operatorsTable();
         printGeneratorsStats();
+    }
+
+    private void operatorsTable() {
+        System.out.println("Stats for operators:");
+        System.out.println("+----+--------------+");
+        System.out.println("| ID | Work Time (%)|");
+        System.out.println("+----+--------------+");
+        for (Operator operator : operators) {
+            System.out.printf("| %-2d | %-12.2f |\n", operator.getId(), operator.getTotalWorkTime() / currentTime * 100);
+        }
+        System.out.println("+----+--------------+");
     }
 
     private void printGeneratorsStats() {
@@ -231,6 +263,7 @@ public class Model {
             processTimeVariance[i] = 0;
             totalCalls[i] = generators.get(i).generatedItemsAmount;
         }
+        System.out.println("Stats for each generator:");
         for (Call call : calls) {
             int index = call.getGeneratorId() - 1;
             if (call.isRejected()) {
@@ -267,27 +300,23 @@ public class Model {
                 processTimeVariance[index] += Math.pow(processTime - avrProcessTime[index], 2) / workingCalls;
             }
         }
+        printCombinedStatsTable(rejectedCalls, avrTimeSystem, avrWaitTime, avrProcessTime, waitTimeVariance, processTimeVariance);
+    }
+
+    private void printCombinedStatsTable(int[] rejectedCalls, double[] avrTimeSystem, double[] avrWaitTime, double[] avrProcessTime, double[] waitTimeVariance, double[] processTimeVariance) {
+        System.out.println("+-----+---------------+--------------------+---------------+------------------+--------------------+-----------------------+");
+        System.out.printf("| %-3s | %-13s | %-18s | %-13s | %-16s | %-18s | %-21s |\n",
+                "ID", "Total Calls", "Rejected Calls (%)", "Avg Wait Time", "Avg Process Time", "Wait Time Variance", "Process Time Variance");
+        System.out.println("+-----+---------------+--------------------+---------------+------------------+--------------------+-----------------------+");
 
         int i = 0;
         for (CallGenerator generator : generators) {
-            generatorStats(generator, rejectedCalls[i], avrTimeSystem[i], avrWaitTime[i],
-                    avrProcessTime[i], processTimeVariance[i], waitTimeVariance[i]);
+            int totalCalls = generator.generatedItemsAmount;
+            double rejectedPercent = (double) rejectedCalls[i] / totalCalls * 100;
+            System.out.printf("| %-3s | %-13d | %-18.2f | %-13.2f | %-16.2f | %-18.2f | %-21.2f |\n",
+                    generator.getId(), totalCalls, rejectedPercent, avrWaitTime[i], avrProcessTime[i], waitTimeVariance[i], processTimeVariance[i]);
             i++;
         }
-    }
-
-    public void generatorStats(CallGenerator generator, int rejectedCalls,
-                               double avrTimeSystem, double avrWaitTime, double avrProcessTime,
-                               double processDispersion, double waitDispersion) {
-        System.out.println("Statistic for generator " + generator.getId());
-        int totalCalls = generator.generatedItemsAmount;
-        System.out.println("The number of calls generated: " + totalCalls);
-        double rejectedPercent = (double) rejectedCalls / totalCalls * 100;
-        System.out.printf("The percent of rejection: %.2f%%\n", rejectedPercent);
-        System.out.println("Average time of request waiting: " + avrWaitTime);
-        System.out.println("Average time of request in the system: " + avrTimeSystem);
-        System.out.println("Average time of request service: " + avrProcessTime);
-        System.out.println("Variance of wait time: " + waitDispersion);
-        System.out.println("Variance of process time: " + processDispersion + "\n");
+        System.out.println("+-----+---------------+--------------------+---------------+------------------+--------------------+-----------------------+");
     }
 }

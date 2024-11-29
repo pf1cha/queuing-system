@@ -67,4 +67,19 @@ public class CallQueueBuffer {
     public int size() {
         return size;
     }
+
+    public void info() {
+        System.out.println("+--------------+--------+");
+        System.out.printf("| %-12s | %-6s |\n", "Buffer Index", "Status");
+        System.out.println("+--------------+--------+");
+
+        for (int i = 0; i < capacity; ++i) {
+            String index = (i == pointer) ? i + "(*)" : String.valueOf(i);
+            String status = (buffer[i] == null) ? "empty" : "Call " + buffer[i].getId();
+//            String pointerIndicator = (pointer == i) ? " <- pointer" : "";
+            System.out.printf("| %-12s | %-6s |\n", index, status);
+        }
+
+        System.out.println("+--------------+--------+");
+    }
 }
